@@ -29,7 +29,7 @@ jobs:
               # tag=$(git describe --tags --abbrev=0)
               release_name="libpinproc-dev-2.1-linux-${{ matrix.target }}"                 
               rm bin/libpinproc.so
-              rn bin/libpinproc.so.2.1 bin/libpinproc.so              
+              mv bin/libpinproc.so.2.1 bin/libpinproc.so              
               7z a -tzip "${release_name}.zip" bin/libpinproc.so bin/pinproctest bin/pinprocfw
               # remove all files apart from the archive
               # rm -rf yes $(ls -I "*.zip" )                
