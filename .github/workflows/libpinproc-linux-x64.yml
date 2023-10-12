@@ -1,0 +1,42 @@
+name: libpinproc-linux-x64
+on:
+  push:
+    branches: [ add_workflow_builds ]
+env:
+  BUILD_TYPE: Release
+jobs:
+  build:
+    name: Release
+    runs-on: ubuntu-latest  
+    strategy:
+      matrix:        
+        include:        
+          - os: ubuntu-latest
+            TARGET: x64    
+    steps:    
+        - uses: actions/checkout@v3
+        - name: Dependencies
+          run: |
+            sudo apt-get -y install libftdi1 libftdi1-dev libudev-dev libusb-dev libboost-dev
+        - name: Cmake build
+          run: |
+            mkdir bin;cd bin
+            cmake .. -DCMAKE_CXX_FLAGS="-fPIC" -DBUILD_SHARED_LIBS=ON
+            make
+        - name: Package Zip
+          shell: bash
+          run: |              
+              # tag=$(git describe --tags --abbrev=0)
+              release_name="libpinproc-dev-2.1-linux-${{ matrix.target }}"                 
+              rm bin/libpinproc.so
+              mv bin/libpinproc.so.2.1 bin/libpinproc.so              
+              7z a -tzip "${release_name}.zip" bin/libpinproc.so bin/pinproctest bin/pinprocfw
+              # remove all files apart from the archive
+              # rm -rf yes $(ls -I "*.zip" )                
+        - name: Publish
+          uses: softprops/action-gh-release@v1
+          with:
+            tag_name: "2.1"
+            files: "libpinproc*"
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}                 

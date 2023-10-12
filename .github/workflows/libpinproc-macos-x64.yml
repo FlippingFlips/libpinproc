@@ -1,0 +1,45 @@
+name: libpinproc-macos-x64
+on:
+  push:
+    branches: [ add_workflow_builds ]
+env:
+  BUILD_TYPE: Release
+jobs:
+  build:
+    name: Release
+    runs-on: ${{ matrix.os }}    
+    strategy:
+      matrix:
+        
+        include:
+        - os: macos-latest
+          TARGET: x86_64-apple-darwin
+          COMPILER: clang
+          LINKER: clang
+    steps:    
+    - uses: actions/checkout@v2
+    - name: BuildCmake
+      run: |
+        brew install libusb-compat
+        brew install libftdi
+        mkdir bin
+        cd bin
+        cmake .. -DCMAKE_CXX_FLAGS="-fPIC" -DBUILD_SHARED_LIBS=ON
+        make          
+    - name: Build
+      shell: bash
+      run: |
+        # tag=$(git describe --tags --abbrev=0)
+        release_name="libpinproc-dev-2.1-macos-${{ matrix.target }}"        
+        rm bin/libpinproc.dylib
+        mv bin/libpinproc.2.1.dylib bin/libpinproc.dylib
+        7z a -tzip "${release_name}.zip" "bin/libpinproc.dylib" "bin/pinproctest" "bin/pinprocfw"
+        # remove all files apart from the archive
+        # rm -rf yes $(ls -I "*.zip" )
+    - name: Publish
+      uses: softprops/action-gh-release@v1
+      with:
+          tag_name: "2.1"
+          files: "libpinproc*.zip"
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
