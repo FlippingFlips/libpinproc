@@ -33,7 +33,7 @@ jobs:
         release_name="libpinproc-dev-2.1-macos-${{ matrix.target }}"        
         rm bin/libpinproc.dylib
         mv bin/libpinproc.2.1.dylib bin/libpinproc.dylib
-        7z a -tzip "${release_name}.zip" "bin/libpinproc.dylib" "/bin/pinproctest" "bin/pinprocfw"
+        7z a -tzip "${release_name}.zip" "bin/libpinproc.dylib" "bin/pinproctest" "bin/pinprocfw"
         # remove all files apart from the archive
         # rm -rf yes $(ls -I "*.zip" )
     - name: Publish
