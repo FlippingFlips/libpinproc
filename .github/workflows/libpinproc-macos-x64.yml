@@ -31,7 +31,9 @@ jobs:
       run: |
         # tag=$(git describe --tags --abbrev=0)
         release_name="libpinproc-dev-2.1-macos-${{ matrix.target }}"        
-        7z a -tzip "${release_name}.zip" "/Users/runner/work/libpinproc/libpinproc/bin/libpinproc.dylib" "/Users/runner/work/libpinproc/libpinproc/bin/pinproctest" "/Users/runner/work/libpinproc/libpinproc/bin/pinprocfw"
+        rm bin/libpinproc.dylib
+        rm bin/libpinproc.dylib.2.1 bin/libpinproc.dylib
+        7z a -tzip "${release_name}.zip" "bin/libpinproc.dylib" "/bin/pinproctest" "bin/pinprocfw"
         # remove all files apart from the archive
         # rm -rf yes $(ls -I "*.zip" )
     - name: Publish
