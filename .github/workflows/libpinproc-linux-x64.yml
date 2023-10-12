@@ -27,8 +27,10 @@ jobs:
           shell: bash
           run: |              
               # tag=$(git describe --tags --abbrev=0)
-              release_name="libpinproc-dev-2.1-linux-${{ matrix.target }}"        
-              7z a -tzip "${release_name}.zip" bin/libpinproc.so bin/pinproctest bin/pinprocfw
+              release_name="libpinproc-dev-2.1-linux-${{ matrix.target }}"   
+              rm libpinproc.so
+              rn libpinproc.so.2.1 libpinproc.so
+              7z a -tzip "${release_name}.zip" libpinproc.so pinproctest pinprocfw
               # remove all files apart from the archive
               # rm -rf yes $(ls -I "*.zip" )                
         - name: Publish
