@@ -12,9 +12,7 @@ jobs:
       matrix:        
         include:        
           - os: ubuntu-latest
-            TARGET: x64
-            COMPILER: gcc
-            LINKER: gcc       
+            TARGET: x64    
     steps:    
         - uses: actions/checkout@v3
         - name: Dependencies
@@ -25,7 +23,7 @@ jobs:
             mkdir bin;cd bin
             cmake .. -DCMAKE_CXX_FLAGS="-fPIC" -DBUILD_SHARED_LIBS=ON
             make
-        - name: Build
+        - name: Package Zip
           shell: bash
           run: |
               # tag=$(git describe --tags --abbrev=0)
