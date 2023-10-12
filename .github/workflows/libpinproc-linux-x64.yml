@@ -1,7 +1,7 @@
 name: libpinproc-linux-x64
 on:
   push:
-    branches: [ add_workflow_builds ]
+    branches: [ dev ]
 env:
   BUILD_TYPE: Release
 jobs:

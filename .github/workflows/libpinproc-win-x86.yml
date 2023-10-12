@@ -1,7 +1,7 @@
 name: libpinproc-win-x86
 on:
   push:
-    branches: [ add_workflow_builds ]
+    branches: [ dev ]
 env:
   # Win32 Release
   BUILD_TYPE: Release
