@@ -1,0 +1,53 @@
+name: libpinproc-win-x64
+on:
+  push:
+    branches: [ add_workflow_builds ]
+env:
+  # Win64 Release
+  BUILD_TYPE: Release
+jobs:
+  build:
+    name: Release
+    strategy:
+      matrix:
+        kind: ['windows']
+        include:
+          - kind: windows
+            os: windows-latest
+            target: win-x64    
+    # Run windows. Cmake and other binaries are available but some are downloaded below
+    runs-on: ${{ matrix.os }}
+    steps:    
+    - uses: actions/checkout@v2
+    - name: Download Ftdi
+      run: |
+        curl  https://ftdichip.com/wp-content/uploads/2023/09/CDM-v2.12.36.4-WHQL-Certified.zip --output ftd2xx.zip
+        7z x ftd2xx.zip -oD:/a/libpinproc/libpinproc/ftd2xx -aos
+    - name: BuildCmake
+      # Set build Win64 and to build shared libs /  DLL with DBUILD_SHARED_LIBS
+      run: |
+        vcpkg install libftdi1
+        mkdir bin
+        cd bin
+        Copy-Item ../ftd2xx/ftd2xx.h -Destination .
+        Copy-Item ../ftd2xx/amd64/ftd2xx.lib -Destination .
+        cmake .. -G "Visual Studio 17 2022" -A x64 -DEXTRA_INC=".\ftd2xx" -DEXTRA_LINK=".\ftd2xx\amd64" -DBUILD_SHARED_LIBS=ON          
+      # Setup MSBuild as it's not installed by default
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1      
+    - name: Build
+      shell: bash
+      run: |
+        # tag=$(git describe --tags --abbrev=0)
+        release_name="libpinproc-dev-2.1-${{ matrix.target }}"
+        msbuild.exe D:/a/libpinproc/libpinproc/bin/ALL_BUILD.vcxproj -p:Configuration=Release        
+        7z a -tzip "${release_name}.zip" "D:/a/libpinproc/libpinproc/bin/release/*"
+        # remove all files apart from the archive
+        rm -rf yes $(ls -I "*.zip" )
+    - name: Publish
+      uses: softprops/action-gh-release@v1
+      with:
+          tag_name: "2.1"
+          files: "libpinproc*"
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
